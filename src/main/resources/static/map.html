@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rain Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js">
+
+</script>
+
+<script>
+  const map = L.map('map').setView([28.45, 77.00], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  fetch('http://localhost:8080/reports')
+          .then(res => res.json())
+          .then(data => {
+            data.forEach(report => {
+              const color =
+                      report.level === "HIGH" ? "red" :
+                              report.level === "MEDIUM" ? "orange" :
+                                      "green";
+
+              const marker = L.circleMarker(
+                      [report.latitude, report.longitude],
+                      {
+                        color: color,
+                        radius: 6
+                      }
+              ).addTo(map);
+
+              marker.bindPopup(
+                      `Severity: ${report.severity}<br>Level: ${report.level}<br>Cell: ${report.cellId}`
+              );
+            });
+          });
+</script>
+
+</body>
+</html>
